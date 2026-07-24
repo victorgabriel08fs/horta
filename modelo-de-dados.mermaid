@@ -1,0 +1,94 @@
+erDiagram
+    USERS ||--o{ RESERVATIONS : "faz (opcional)"
+    CATEGORIES ||--o{ PRODUCTS : "agrupa"
+    PRODUCTS ||--o{ CYCLE_PRODUCTS : "ofertado em"
+    DELIVERY_CYCLES ||--o{ CYCLE_PRODUCTS : "disponibiliza"
+    DELIVERY_CYCLES ||--o{ RESERVATIONS : "recebe"
+    DELIVERY_CYCLES ||--o{ CYCLE_DELIVERY_POINTS : "atende em"
+    DELIVERY_POINTS ||--o{ CYCLE_DELIVERY_POINTS : "serve"
+    CYCLE_DELIVERY_POINTS ||--o{ RESERVATIONS : "recebido em"
+    RESERVATIONS ||--o{ RESERVATION_ITEMS : "contém"
+    PRODUCTS ||--o{ RESERVATION_ITEMS : "referencia"
+    CYCLE_PRODUCTS ||--o{ RESERVATION_ITEMS : "consome"
+
+    USERS {
+        bigint id PK
+        string name
+        string email UK
+        string password
+        string role "admin | customer"
+        string phone "nullable"
+    }
+    CATEGORIES {
+        bigint id PK
+        string name
+        string slug UK
+        int position "nullable"
+    }
+    PRODUCTS {
+        bigint id PK
+        bigint category_id FK "nullable"
+        string name
+        string slug UK
+        text description "nullable"
+        string unit "kg | unidade | maco | duzia | bandeja"
+        decimal price
+        string image_path "nullable"
+        boolean is_active
+    }
+    DELIVERY_CYCLES {
+        bigint id PK
+        string title "nullable"
+        date delivery_date
+        datetime order_opens_at
+        datetime order_closes_at
+        string status "draft | open | closed | delivered | cancelled"
+        text notes "nullable"
+    }
+    CYCLE_PRODUCTS {
+        bigint id PK
+        bigint delivery_cycle_id FK
+        bigint product_id FK
+        decimal quantity_available
+        decimal price_override "nullable"
+    }
+    DELIVERY_POINTS {
+        bigint id PK
+        string name
+        string address "nullable"
+        string reference "nullable"
+        boolean is_active
+    }
+    CYCLE_DELIVERY_POINTS {
+        bigint id PK
+        bigint delivery_cycle_id FK
+        bigint delivery_point_id FK
+        datetime scheduled_at "nullable"
+        int capacity "nullable"
+        string notes "nullable"
+    }
+    RESERVATIONS {
+        bigint id PK
+        bigint delivery_cycle_id FK
+        bigint cycle_delivery_point_id FK
+        bigint user_id FK "nullable"
+        string guest_name "nullable"
+        string guest_email "nullable"
+        string guest_phone "nullable"
+        string delivery_point_name "snapshot"
+        string status "confirmed | delivered | cancelled"
+        string confirmation_code UK
+        decimal total_amount
+        text notes "nullable"
+    }
+    RESERVATION_ITEMS {
+        bigint id PK
+        bigint reservation_id FK
+        bigint product_id FK
+        bigint cycle_product_id FK
+        string product_name "snapshot"
+        string unit "snapshot"
+        decimal unit_price "snapshot"
+        decimal quantity
+        decimal line_total
+    }
