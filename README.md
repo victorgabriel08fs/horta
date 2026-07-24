@@ -57,6 +57,11 @@ npm install
 # 3. Migrar + popular dados de demonstração
 php artisan migrate:fresh --seed
 
+# (Opcional) Banco BEM populado: ~100 clientes, dezenas de produtos e uma
+# linha do tempo de ciclos (passados/entregues, em separação, o atual aberto
+# e futuros programados) com centenas de reservas:
+php artisan migrate:fresh && php artisan db:seed --class=BigDemoSeeder
+
 # 4. Link de storage (fotos de produtos)
 php artisan storage:link
 
