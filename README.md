@@ -31,7 +31,7 @@ Aplicação **full-stack funcional**, com backend e frontend integrados:
 
 **Contato obrigatório**: e-mail **ou** telefone é exigido para reservar e para consultar a reserva (com verificação).
 
-> Convenções para evoluir o projeto: [`BOAS-PRATICAS.md`](./BOAS-PRATICAS.md).
+> Convenções para evoluir o projeto: [`BOAS-PRATICAS.md`](./BOAS-PRATICAS.md) · próximas ideias/tarefas: [`BACKLOG.md`](./BACKLOG.md).
 
 ---
 

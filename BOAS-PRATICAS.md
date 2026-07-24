@@ -38,6 +38,60 @@ Leia junto com [`ARQUITETURA.md`](./ARQUITETURA.md) (o "porquê") — aqui está
 - **Form Requests**: validação e `authorize()` ficam aqui, não no controller. Mensagens em pt-BR via `messages()`/`attributes()`.
 - **Erros de domínio**: lance `ReservationException` no Service; converta para `ValidationException` no controller (o Inertia mostra como erro de formulário).
 
+### 2.1 Validação sempre em Form Requests (atributos + mensagens em pt-BR)
+
+Toda entrada HTTP não-trivial vai num **Form Request** dedicado (`php artisan make:request`), nunca `$request->validate()` espalhado no controller. Um Form Request concentra quatro responsabilidades:
+
+1. **`authorize()`** — quem pode enviar (papel/dono). `false` → 403. Quando o grupo inteiro já está atrás do middleware `admin`, ainda vale retornar `->isAdmin()` como defesa em profundidade.
+2. **`rules()`** — as regras; podem ser **condicionais** conforme o contexto.
+3. **`attributes()`** — nomes amigáveis em pt-BR, usados nas mensagens automáticas.
+4. **`messages()`** — mensagens específicas por regra, em pt-BR, só onde a padrão não basta.
+
+```php
+class StoreProductRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return $this->user()?->isAdmin() ?? false;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name'  => ['required', 'string', 'max:160'],
+            'unit'  => ['required', new Enum(ProductUnit::class)],
+            'price' => ['required', 'numeric', 'min:0'],
+            'image' => ['nullable', 'image', 'max:4096'],
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return ['name' => 'nome', 'unit' => 'unidade', 'price' => 'preço'];
+    }
+
+    public function messages(): array
+    {
+        return ['price.min' => 'O preço não pode ser negativo.'];
+    }
+}
+```
+
+Regras práticas:
+
+- **Sempre `attributes()`** para campos com nome técnico: a mensagem padrão vira "O campo **preço** é obrigatório." em vez de "The price field is required.".
+- **`messages()` é cirúrgico** — use para regras que a mensagem padrão não expressa bem (`required_without`, `after`, `distinct`, regras de negócio). Não reescreva tudo.
+- **Regras condicionais** montam o array no `rules()` conforme o contexto. Ex. real (`StoreReservationRequest`): convidado exige nome **e** e-mail **ou** telefone via `required_without`:
+  ```php
+  if ($isGuest) {
+      $rules['guest_name']  = ['required', 'string', 'max:120'];
+      $rules['guest_phone'] = ['nullable', 'required_without:guest_email', 'string', 'max:40'];
+      $rules['guest_email'] = ['nullable', 'required_without:guest_phone', 'email', 'max:160'];
+  }
+  ```
+- **Não valide regra de negócio aqui** (estoque, ponto pertencer ao ciclo, capacidade): isso é do `ReservationService`, que lança `ReservationException` → convertida em `ValidationException` no controller.
+- **Reaproveite** um mesmo Form Request para `store` e `update` quando as regras coincidem; use `->ignore($id)` no `unique` para o update.
+
 ---
 
 ## 3. Onde colocar cada coisa (frontend)
@@ -166,4 +220,4 @@ Exemplo mental: "adicionar limite de itens por reserva".
 
 **Fase 3** — notificações (e-mail/WhatsApp: abertura do ciclo, confirmação, lembrete), pagamento online (PIX/Mercado Pago — o modelo já isola o pagamento), recorrência de ciclos, entrega em endereço, PWA.
 
-> Ao evoluir, mantenha este documento vivo: se criar um novo padrão, registre-o aqui.
+> O detalhamento acionável dessas e de outras ideias vive em [`BACKLOG.md`](./BACKLOG.md) (ex.: checkout em passos, animações, activity logs, reservas via fila, notificações no navegador). Ao evoluir, mantenha este documento vivo: se criar um novo padrão, registre-o aqui.
