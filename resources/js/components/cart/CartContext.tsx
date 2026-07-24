@@ -8,6 +8,8 @@ interface CartContextValue {
     setQuantity: (cycleProductId: number, quantity: number) => void;
     remove: (cycleProductId: number) => void;
     clear: () => void;
+    /** Vincula o carrinho a um ciclo; se for outro ciclo, esvazia. */
+    scopeToCycle: (cycleId: number) => void;
     count: number;
     totalUnits: number;
 }
@@ -33,54 +35,56 @@ function load(): StoredCart {
     }
 }
 
-export function CartProvider({ cycleId = null, children }: { cycleId?: number | null; children: ReactNode }) {
-    const [lines, setLines] = useState<CartLine[]>(() => {
-        const stored = load();
-        // Se o carrinho é de outro ciclo, começa vazio.
-        if (cycleId !== null && stored.cycleId !== null && stored.cycleId !== cycleId) {
-            return [];
-        }
-        return stored.lines;
-    });
+/**
+ * Provider global do carrinho (montado na raiz em app.tsx).
+ * Assim `useCart()` funciona em qualquer componente — inclusive no corpo de uma página.
+ */
+export function CartProvider({ children }: { children: ReactNode }) {
+    const [state, setState] = useState<StoredCart>(() => load());
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ cycleId, lines }));
-    }, [cycleId, lines]);
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }, [state]);
+
+    const scopeToCycle = useCallback((cycleId: number) => {
+        setState((prev) => (prev.cycleId === cycleId ? prev : { cycleId, lines: [] }));
+    }, []);
 
     const setQuantity = useCallback((cycleProductId: number, quantity: number) => {
-        setLines((prev) => {
-            const next = prev.filter((l) => l.cycle_product_id !== cycleProductId);
+        setState((prev) => {
+            const lines = prev.lines.filter((l) => l.cycle_product_id !== cycleProductId);
             if (quantity > 0) {
-                next.push({ cycle_product_id: cycleProductId, quantity });
+                lines.push({ cycle_product_id: cycleProductId, quantity });
             }
-            return next;
+            return { ...prev, lines };
         });
     }, []);
 
     const remove = useCallback((cycleProductId: number) => {
-        setLines((prev) => prev.filter((l) => l.cycle_product_id !== cycleProductId));
+        setState((prev) => ({ ...prev, lines: prev.lines.filter((l) => l.cycle_product_id !== cycleProductId) }));
     }, []);
 
-    const clear = useCallback(() => setLines([]), []);
+    const clear = useCallback(() => setState((prev) => ({ ...prev, lines: [] })), []);
 
     const quantityOf = useCallback(
-        (cycleProductId: number) => lines.find((l) => l.cycle_product_id === cycleProductId)?.quantity ?? 0,
-        [lines],
+        (cycleProductId: number) => state.lines.find((l) => l.cycle_product_id === cycleProductId)?.quantity ?? 0,
+        [state.lines],
     );
 
     const value = useMemo<CartContextValue>(
         () => ({
-            cycleId,
-            lines,
+            cycleId: state.cycleId,
+            lines: state.lines,
             quantityOf,
             setQuantity,
             remove,
             clear,
-            count: lines.length,
-            totalUnits: lines.reduce((sum, l) => sum + l.quantity, 0),
+            scopeToCycle,
+            count: state.lines.length,
+            totalUnits: state.lines.reduce((sum, l) => sum + l.quantity, 0),
         }),
-        [cycleId, lines, quantityOf, setQuantity, remove, clear],
+        [state, quantityOf, setQuantity, remove, clear, scopeToCycle],
     );
 
     return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

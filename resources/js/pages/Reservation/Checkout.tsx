@@ -14,7 +14,7 @@ interface Props {
     products: CatalogProduct[];
 }
 
-export default function Checkout({ cycle, points, products }: Props) {
+function CheckoutContent({ cycle, points, products }: Props) {
     const { auth } = usePage<SharedProps>().props;
     const user = auth?.user;
     const cart = useCart();
@@ -42,24 +42,18 @@ export default function Checkout({ cycle, points, products }: Props) {
 
     if (lines.length === 0) {
         return (
-            <AppLayout cartCycleId={cycle.id}>
-                <Head title="Checkout" />
-                <div className="mx-auto max-w-2xl">
-                    <EmptyState
-                        title="Nada para reservar ainda"
-                        description="Adicione produtos ao carrinho antes de finalizar a reserva."
-                        action={<ButtonLink href="/">Ver o catálogo</ButtonLink>}
-                    />
-                </div>
-            </AppLayout>
+            <div className="mx-auto max-w-2xl">
+                <EmptyState
+                    title="Nada para reservar ainda"
+                    description="Adicione produtos ao carrinho antes de finalizar a reserva."
+                    action={<ButtonLink href="/">Ver o catálogo</ButtonLink>}
+                />
+            </div>
         );
     }
 
     return (
-        <AppLayout cartCycleId={cycle.id}>
-            <Head title="Finalizar reserva" />
-
-            <form onSubmit={submit} className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1fr_360px]">
+        <form onSubmit={submit} className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1fr_360px]">
                 <div className="space-y-6">
                     {/* Escolha do ponto de entrega */}
                     <Card className="p-6">
@@ -208,7 +202,15 @@ export default function Checkout({ cycle, points, products }: Props) {
                         </ButtonLink>
                     </Card>
                 </div>
-            </form>
+        </form>
+    );
+}
+
+export default function Checkout({ cycle, points, products }: Props) {
+    return (
+        <AppLayout cartCycleId={cycle.id}>
+            <Head title="Finalizar reserva" />
+            <CheckoutContent cycle={cycle} points={points} products={products} />
         </AppLayout>
     );
 }

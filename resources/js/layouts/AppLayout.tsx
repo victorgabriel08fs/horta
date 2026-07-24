@@ -1,9 +1,18 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { ReactNode } from 'react';
-import { CartProvider, useCart } from '@/components/cart/CartContext';
+import { ReactNode, useEffect } from 'react';
+import { useCart } from '@/components/cart/CartContext';
 import { Flash } from '@/components/Flash';
 import { cn } from '@/lib/cn';
 import { SharedProps } from '@/types';
+
+/** Vincula o carrinho ao ciclo atual (esvazia se o cliente mudou de ciclo). */
+function CartScope({ cycleId }: { cycleId: number | null }) {
+    const { scopeToCycle } = useCart();
+    useEffect(() => {
+        if (cycleId != null) scopeToCycle(cycleId);
+    }, [cycleId, scopeToCycle]);
+    return null;
+}
 
 function currentPath(): string {
     return typeof window !== 'undefined' ? window.location.pathname : '';
@@ -133,16 +142,15 @@ export default function AppLayout({
     cartCycleId?: number | null;
 }) {
     return (
-        <CartProvider cycleId={cartCycleId}>
-            <div className="flex min-h-dvh flex-col bg-stone-50">
-                <Header />
-                <Flash />
-                <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-28 sm:py-8 sm:pb-10">{children}</main>
-                <footer className="hidden border-t border-stone-200 bg-white py-6 text-center text-sm text-stone-400 sm:block">
-                    🌱 Horta — produtos fresquinhos, entrega coletiva semanal.
-                </footer>
-                <BottomNav />
-            </div>
-        </CartProvider>
+        <div className="flex min-h-dvh flex-col bg-stone-50">
+            <CartScope cycleId={cartCycleId} />
+            <Header />
+            <Flash />
+            <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-28 sm:py-8 sm:pb-10">{children}</main>
+            <footer className="hidden border-t border-stone-200 bg-white py-6 text-center text-sm text-stone-400 sm:block">
+                🌱 Horta — produtos fresquinhos, entrega coletiva semanal.
+            </footer>
+            <BottomNav />
+        </div>
     );
 }

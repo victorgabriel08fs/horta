@@ -56,7 +56,7 @@ resources/js/
 - **Props tipados**: todo dado vindo do backend tem um tipo em `types/` ou na própria página. O shape do presenter no PHP e o tipo no TS **andam juntos** — mudou um, muda o outro.
 - **Reuse as primitivas** de `components/ui.tsx`. Não recrie botões/inputs à mão.
 - **Formatação centralizada**: use `brl()`, `qty()`, `dateBR()`, `timeBR()` de `lib/format.ts`. Nunca formate moeda/data inline.
-- **Estado do carrinho** só via `useCart()`; a verdade de disponibilidade é sempre revalidada no backend ao confirmar.
+- **Estado do carrinho** só via `useCart()`. O `CartProvider` é montado **na raiz** (`app.tsx`), então `useCart()` funciona em qualquer componente — inclusive no corpo de uma página. Para vincular o carrinho a um ciclo (e esvaziar quando o cliente muda de ciclo), passe `cartCycleId={cycle.id}` ao `AppLayout` (ele chama `scopeToCycle` internamente). A verdade de disponibilidade é sempre revalidada no backend ao confirmar.
 - **Formulários**: use `useForm` do Inertia; exiba `form.errors.campo` em cada `<Field error=…>`. Uploads: `forceFormData: true` e spoof de método (`transform((d)=>({...d,_method:'put'}))`).
 
 ---
