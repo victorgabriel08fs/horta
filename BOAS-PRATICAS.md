@@ -92,6 +92,22 @@ Regras práticas:
 - **Não valide regra de negócio aqui** (estoque, ponto pertencer ao ciclo, capacidade): isso é do `ReservationService`, que lança `ReservationException` → convertida em `ValidationException` no controller.
 - **Reaproveite** um mesmo Form Request para `store` e `update` quando as regras coincidem; use `->ignore($id)` no `unique` para o update.
 
+### 2.2 Listagens: paginação e filtros por padrão
+
+Toda listagem (admin **e** pública) nasce **paginada e filtrável** — nunca `->get()` da tabela inteira. Com o banco crescendo (veja o `BigDemoSeeder`), listar tudo trava a tela e o servidor.
+
+**Backend**
+- Use `->paginate(20)` (ou `simplePaginate`) e passe o paginator ao Inertia — ele serializa `data` + `links` + `meta`. **Preserve a query** com `->withQueryString()`.
+- Filtros por query string com `->when($request->filled('x'), fn ($q) => $q->where(...))`. Devolva os filtros aplicados nos props (`'filters' => $request->only([...])`) para o front refletir o estado.
+- Ordenação também por query string, com **whitelist** de colunas permitidas.
+- Transforme só a página atual (`$paginator->through(fn ($m) => [...])`), não a coleção toda.
+
+**Frontend (Inertia + React)**
+- Filtros/paginação mudam a URL com `router.get(url, params, { preserveState: true, preserveScroll: true, replace: true, only: ['lista', 'filters'] })` — **partial reload**, recarrega só o que muda.
+- Busca textual com **debounce** (~300ms). O estado do filtro vive na **URL** (compartilhável e "bookmarkável").
+- Sempre mostrar **contagem de resultados** e `EmptyState` quando vazio; controles de página a partir de `meta`/`links`.
+- No mobile, a tabela vira **cards empilhados** ou rola dentro de um container `overflow-x-auto` — **nunca** a página inteira (ver [`BACKLOG.md`](./BACKLOG.md) B-07).
+
 ---
 
 ## 3. Onde colocar cada coisa (frontend)

@@ -108,6 +108,55 @@ Complementa o roadmap de alto nível da [`ARQUITETURA.md` §13](./ARQUITETURA.md
 
 ---
 
+## B-07 · Melhorar o mobile do painel administrativo — 💡 Backlog
+
+- **Prioridade:** alta · **Esforço:** M · **Sprint sugerida:** Sprint 5 (UX)
+- **Motivação:** as telas do admin (tabelas de produtos, ciclos, reservas, separação) ficam **largas demais** no celular — a página inteira rola na horizontal, o que é ruim para o gestor usar no telefone.
+- **Esboço técnico:**
+  - Tabelas viram **cards empilhados** no mobile (`< sm`) e tabela só em telas maiores — ou envolver a tabela num container `overflow-x-auto` isolado (o **corpo da página nunca** rola na horizontal).
+  - Esconder colunas secundárias no mobile (`hidden sm:table-cell`) e priorizar 2–3 informações por linha.
+  - Revisar larguras fixas, `min-w`, e o padding do `AdminLayout` para caber em 375px.
+  - Ações (Editar/Remover) acessíveis com toque confortável; considerar menu "⋯" por item no mobile.
+- **Critérios de aceite:**
+  - [ ] Nenhuma tela do `/admin` gera scroll horizontal **do corpo da página** em 375px.
+  - [ ] Listagens legíveis no celular (cards ou tabela com rolagem contida).
+  - [ ] Alvos de toque ≥ 44px nas ações; nada cortado fora da viewport.
+
+---
+
+## B-08 · Paginação + filtros por padrão em todas as listagens — 💡 Backlog
+
+- **Prioridade:** alta · **Esforço:** G · **Sprint sugerida:** Sprint 5 (UX/Listas)
+- **Motivação:** hoje as listagens usam `->get()` (tabela inteira). Com o volume do `BigDemoSeeder` (100+ clientes, centenas de reservas), isso fica pesado e difícil de navegar. **Convenção já documentada** em [`BOAS-PRATICAS.md` §2.2](./BOAS-PRATICAS.md) — falta **aplicar** nas listagens existentes.
+- **Escopo (listagens a migrar):** admin de produtos, categorias, pontos, ciclos, **reservas do ciclo** (já filtra por ponto — falta paginar), dashboard (reservas recentes), histórico do cliente e, no público, o catálogo se a oferta crescer.
+- **Esboço técnico:**
+  - Backend: `->paginate(20)->withQueryString()`, `->through(fn ($m) => [...])` para transformar só a página; filtros com `->when(...)`; devolver `filters` nos props; ordenação com whitelist.
+  - Frontend: componente reutilizável `Pagination` (a partir de `meta.links`) + `Filters` (busca com debounce, selects de status/categoria/ponto); `router.get(..., { preserveState, preserveScroll, replace, only: [...] })` para **partial reload**.
+  - Filtros comuns por listagem: busca por nome/código, status, categoria, ponto, período.
+- **Critérios de aceite:**
+  - [ ] Toda listagem pagina (default 20) e preserva a query ao paginar/filtrar.
+  - [ ] Filtros refletidos na URL (compartilhável) e no estado da tela; busca com debounce.
+  - [ ] Partial reload (só a lista recarrega, não a página inteira).
+  - [ ] Contagem de resultados + `EmptyState`; funciona junto do mobile (B-07).
+
+---
+
+## B-09 · Selects com busca assíncrona e paginada (async paginate) — 💡 Backlog
+
+- **Prioridade:** média · **Esforço:** M · **Sprint sugerida:** Sprint 7 (Async) · **Depende de:** B-08
+- **Motivação:** selects que hoje carregam **todas** as opções de uma vez (ex.: produtos no formulário de ciclo, categoria no produto e, no futuro, cliente ao filtrar reservas) não escalam conforme o cadastro cresce.
+- **Esboço técnico:**
+  - Combobox com busca: digita → busca no backend um endpoint paginado (`GET /admin/…/options?q=&page=`) que retorna `{ data, next_page }`.
+  - Carregar mais ao rolar (infinite scroll) ou botão "carregar mais"; debounce na busca; cache leve do que já veio.
+  - Priorizar onde a lista pode ficar grande: **produtos** e **pontos** no formulário de ciclo; **cliente** em telas de reserva/filtro; categoria se crescer.
+  - Componente reutilizável `AsyncSelect` (headless + acessível; teclado e leitores de tela).
+- **Critérios de aceite:**
+  - [ ] Selects grandes não baixam todas as opções no load; buscam sob demanda (paginado).
+  - [ ] Busca com debounce + "carregar mais"; seleção mantém rótulo mesmo fora da página atual.
+  - [ ] Acessível (teclado, `aria-*`) e utilizável no mobile.
+
+---
+
 ## Ideias soltas (ainda sem recorte)
 
 - Export CSV/PDF da lista de separação (por ponto) — já citado como Fase 2 na arquitetura.
