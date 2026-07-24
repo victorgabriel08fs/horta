@@ -35,7 +35,8 @@ function CheckoutContent({ cycle, points, products }: Props) {
 
     const submit = (e: FormEvent) => {
         e.preventDefault();
-        form.transform((data) => ({ ...data, items: cart.lines })).post('/reservas', {
+        form.transform((data) => ({ ...data, items: cart.lines }));
+        form.post('/reservas', {
             onSuccess: () => cart.clear(),
         });
     };

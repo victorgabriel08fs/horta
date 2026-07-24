@@ -57,7 +57,9 @@ resources/js/
 - **Reuse as primitivas** de `components/ui.tsx`. Não recrie botões/inputs à mão.
 - **Formatação centralizada**: use `brl()`, `qty()`, `dateBR()`, `timeBR()` de `lib/format.ts`. Nunca formate moeda/data inline.
 - **Estado do carrinho** só via `useCart()`. O `CartProvider` é montado **na raiz** (`app.tsx`), então `useCart()` funciona em qualquer componente — inclusive no corpo de uma página. Para vincular o carrinho a um ciclo (e esvaziar quando o cliente muda de ciclo), passe `cartCycleId={cycle.id}` ao `AppLayout` (ele chama `scopeToCycle` internamente). A verdade de disponibilidade é sempre revalidada no backend ao confirmar.
-- **Formulários**: use `useForm` do Inertia; exiba `form.errors.campo` em cada `<Field error=…>`. Uploads: `forceFormData: true` e spoof de método (`transform((d)=>({...d,_method:'put'}))`).
+- **Formulários**: use `useForm` do Inertia; exiba `form.errors.campo` em cada `<Field error=…>`.
+  - ⚠️ `form.transform()` **não é encadeável** no `@inertiajs/react` (retorna `undefined`). Chame em duas linhas: `form.transform((d) => ({ ...d, extra }));` e depois `form.post(url)`. Nunca `form.transform(...).post(...)`.
+  - Uploads/arquivos: `form.post(url, { forceFormData: true })`; para editar com arquivo, faça spoof de método via transform: `form.transform((d) => ({ ...d, _method: 'put' }))` e então `form.post(url, { forceFormData: true })`.
 
 ---
 

@@ -107,11 +107,11 @@ export default function CycleForm({ cycle, availableProducts, availablePoints }:
                 notes: v.notes || null,
             }));
 
-        const transformed = form.transform((d) => ({ ...d, products: productPayload, points: pointPayload }));
+        form.transform((d) => ({ ...d, products: productPayload, points: pointPayload }));
         if (editing) {
-            transformed.put(`/admin/ciclos/${cycle!.id}`);
+            form.put(`/admin/ciclos/${cycle!.id}`);
         } else {
-            transformed.post('/admin/ciclos');
+            form.post('/admin/ciclos');
         }
     };
 

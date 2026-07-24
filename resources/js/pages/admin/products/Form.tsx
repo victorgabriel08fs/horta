@@ -47,7 +47,8 @@ export default function ProductForm({ product, categories, units }: Props) {
         e.preventDefault();
         const opts = { forceFormData: true };
         if (editing) {
-            form.transform((d) => ({ ...d, _method: 'put' })).post(`/admin/produtos/${product!.id}`, opts);
+            form.transform((d) => ({ ...d, _method: 'put' }));
+            form.post(`/admin/produtos/${product!.id}`, opts);
         } else {
             form.post('/admin/produtos', opts);
         }
