@@ -22,8 +22,8 @@ const variants: Record<Variant, string> = {
 
 const sizes: Record<Size, string> = {
     sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-5 py-2.5 text-base',
+    md: 'min-h-11 px-4 py-2.5 text-sm',
+    lg: 'min-h-12 px-5 py-3 text-base',
 };
 
 const baseButton =
@@ -62,7 +62,7 @@ export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElem
     return (
         <input
             className={cn(
-                'w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500',
+                'w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500',
                 className,
             )}
             {...props}
@@ -74,7 +74,7 @@ export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTex
     return (
         <textarea
             className={cn(
-                'w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500',
+                'w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500',
                 className,
             )}
             {...props}
@@ -86,7 +86,7 @@ export function Select({ className, children, ...props }: SelectHTMLAttributes<H
     return (
         <select
             className={cn(
-                'w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500',
+                'w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base text-stone-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500',
                 className,
             )}
             {...props}

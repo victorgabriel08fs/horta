@@ -2,6 +2,7 @@ import { Head, useForm, usePage } from '@inertiajs/react';
 import { FormEvent } from 'react';
 import AppLayout from '@/layouts/AppLayout';
 import { useCart } from '@/components/cart/CartContext';
+import { PointsMap } from '@/components/PointsMap';
 import { Button, ButtonLink, Card, EmptyState, Field, Input, Textarea } from '@/components/ui';
 import { cn } from '@/lib/cn';
 import { brl, dateLongBR, qty, timeBR } from '@/lib/format';
@@ -65,8 +66,17 @@ export default function Checkout({ cycle, points, products }: Props) {
                         <h2 className="text-lg font-bold text-stone-800">1. Onde você quer receber?</h2>
                         <p className="mt-1 text-sm text-stone-500">
                             A entrega de <strong className="capitalize">{dateLongBR(cycle.delivery_date)}</strong> passa
-                            por estes pontos. Escolha um:
+                            por estes pontos. Toque no mapa ou escolha na lista:
                         </p>
+
+                        <div className="mt-4">
+                            <PointsMap
+                                points={points}
+                                height={220}
+                                activeId={form.data.cycle_delivery_point_id}
+                                onSelect={(id) => form.setData('cycle_delivery_point_id', id)}
+                            />
+                        </div>
 
                         <div className="mt-4 space-y-3">
                             {points.map((point) => {
@@ -119,30 +129,37 @@ export default function Checkout({ cycle, points, products }: Props) {
                                 Reservando como <strong>{user.name}</strong> ({user.email}).
                             </p>
                         ) : (
-                            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                                <Field label="Nome" required error={form.errors.guest_name}>
-                                    <Input
-                                        value={form.data.guest_name}
-                                        onChange={(e) => form.setData('guest_name', e.target.value)}
-                                        placeholder="Seu nome completo"
-                                    />
-                                </Field>
-                                <Field label="WhatsApp / telefone" required error={form.errors.guest_phone}>
-                                    <Input
-                                        value={form.data.guest_phone}
-                                        onChange={(e) => form.setData('guest_phone', e.target.value)}
-                                        placeholder="(11) 90000-0000"
-                                    />
-                                </Field>
-                                <Field label="E-mail (opcional)" error={form.errors.guest_email}>
-                                    <Input
-                                        type="email"
-                                        value={form.data.guest_email}
-                                        onChange={(e) => form.setData('guest_email', e.target.value)}
-                                        placeholder="voce@email.com"
-                                    />
-                                </Field>
-                            </div>
+                            <>
+                                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                                    <Field label="Nome" required error={form.errors.guest_name}>
+                                        <Input
+                                            value={form.data.guest_name}
+                                            onChange={(e) => form.setData('guest_name', e.target.value)}
+                                            placeholder="Seu nome completo"
+                                        />
+                                    </Field>
+                                    <Field label="WhatsApp / telefone" error={form.errors.guest_phone}>
+                                        <Input
+                                            inputMode="tel"
+                                            value={form.data.guest_phone}
+                                            onChange={(e) => form.setData('guest_phone', e.target.value)}
+                                            placeholder="(11) 90000-0000"
+                                        />
+                                    </Field>
+                                    <Field label="E-mail" error={form.errors.guest_email}>
+                                        <Input
+                                            type="email"
+                                            value={form.data.guest_email}
+                                            onChange={(e) => form.setData('guest_email', e.target.value)}
+                                            placeholder="voce@email.com"
+                                        />
+                                    </Field>
+                                </div>
+                                <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                                    📱 Informe <strong>ao menos um contato</strong> (WhatsApp ou e-mail) — é por ele que
+                                    você consulta a reserva depois.
+                                </p>
+                            </>
                         )}
                         <div className="mt-4">
                             <Field label="Observações (opcional)" error={form.errors.notes}>

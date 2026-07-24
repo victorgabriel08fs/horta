@@ -1,5 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/layouts/AdminLayout';
+import { PointsMap } from '@/components/PointsMap';
 import { Button, ButtonLink, Card, StatusBadge } from '@/components/ui';
 import { brl, dateBR, dateTimeBR, qty, timeBR } from '@/lib/format';
 import { CatalogProduct, CyclePoint, CycleSummary } from '@/types';
@@ -103,6 +104,11 @@ export default function CycleShow({ cycle, notes, products, points }: Props) {
                     <div className="border-b border-stone-100 px-5 py-3">
                         <h3 className="font-semibold text-stone-800">Pontos de entrega ({points.length})</h3>
                     </div>
+                    {points.length > 0 && (
+                        <div className="p-4">
+                            <PointsMap points={points} height={200} />
+                        </div>
+                    )}
                     <ul className="divide-y divide-stone-100">
                         {points.map((p) => (
                             <li key={p.id} className="px-5 py-3">

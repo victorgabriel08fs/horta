@@ -17,6 +17,8 @@ class StoreDeliveryPointRequest extends FormRequest
             'name' => ['required', 'string', 'max:160'],
             'address' => ['nullable', 'string', 'max:255'],
             'reference' => ['nullable', 'string', 'max:255'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'is_active' => ['boolean'],
         ];
     }

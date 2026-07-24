@@ -29,6 +29,8 @@ export interface CyclePoint {
     name: string;
     address: string | null;
     reference: string | null;
+    latitude: number | null;
+    longitude: number | null;
     scheduled_at: string | null;
     capacity: number | null;
     notes: string | null;
@@ -80,6 +82,8 @@ export interface ReservationView {
     guest_phone?: string | null;
     delivery_point_name: string;
     scheduled_at: string | null;
+    point_latitude?: number | null;
+    point_longitude?: number | null;
     delivery_date: string;
     total_amount: number;
     notes: string | null;

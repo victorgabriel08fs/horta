@@ -25,6 +25,14 @@ Aplicação **full-stack funcional**, com backend e frontend integrados:
 - Painel: dashboard, CRUD de categorias/produtos/pontos, CRUD de ciclos (com seleção de produtos + pontos e horários), abrir/fechar/entregar, lista de separação (agregada, por ponto e por cliente), reservas filtráveis por ponto com mudança de status
 - Login/registro
 
+**UX mobile-first** (90% do uso é no celular): navegação inferior por abas na loja, menu lateral no painel, alvos de toque grandes, inputs 16px (sem zoom no iOS), CTAs claros para usuários leigos. Layout com altura correta (`min-h-dvh`).
+
+**Mapa dos pontos** (Leaflet + OpenStreetMap, **sem chave de API**): mapa no catálogo, seleção do ponto por toque no checkout, "como chegar" na confirmação, e seletor de localização no cadastro de pontos.
+
+**Contato obrigatório**: e-mail **ou** telefone é exigido para reservar e para consultar a reserva (com verificação).
+
+> Convenções para evoluir o projeto: [`BOAS-PRATICAS.md`](./BOAS-PRATICAS.md).
+
 ---
 
 ## Pré-requisitos

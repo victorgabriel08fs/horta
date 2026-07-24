@@ -19,23 +19,20 @@ class ReservationLookupController extends Controller
     {
         $data = $request->validate([
             'confirmation_code' => ['required', 'string'],
-            'contact' => ['nullable', 'string'],
+            'contact' => ['required', 'string'],
+        ], [
+            'contact.required' => 'Informe o WhatsApp ou e-mail usado na reserva.',
         ]);
 
         $code = strtoupper(trim($data['confirmation_code']));
-
         $reservation = Reservation::where('confirmation_code', $code)->first();
 
-        // Reforço opcional: se informar contato, precisa bater com e-mail/WhatsApp da reserva.
-        $contactOk = empty($data['contact'])
-            || $reservation && in_array($data['contact'], array_filter([
-                $reservation->guest_phone,
-                $reservation->guest_email,
-            ]), true);
+        // O contato informado precisa bater com o e-mail ou WhatsApp da reserva.
+        $contactOk = $reservation && $this->contactMatches($reservation, trim($data['contact']));
 
         if (! $reservation || ! $contactOk) {
             return back()->withErrors([
-                'confirmation_code' => 'Reserva não encontrada. Confira o código informado.',
+                'confirmation_code' => 'Reserva não encontrada. Confira o código e o contato informados.',
             ]);
         }
 
@@ -43,5 +40,18 @@ class ReservationLookupController extends Controller
             'reservation' => $reservation->id,
             'code' => $reservation->confirmation_code,
         ]);
+    }
+
+    private function contactMatches(Reservation $reservation, string $contact): bool
+    {
+        $emailMatch = $reservation->guest_email
+            && strcasecmp($reservation->guest_email, $contact) === 0;
+
+        $digits = preg_replace('/\D+/', '', $contact);
+        $phoneMatch = $reservation->guest_phone
+            && $digits !== ''
+            && preg_replace('/\D+/', '', $reservation->guest_phone) === $digits;
+
+        return $emailMatch || $phoneMatch;
     }
 }

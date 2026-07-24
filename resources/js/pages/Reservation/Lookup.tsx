@@ -32,13 +32,15 @@ export default function Lookup() {
                             />
                         </Field>
                         <Field
-                            label="WhatsApp ou e-mail (opcional)"
-                            hint="Reforça a segurança da consulta, se você informou no pedido."
+                            label="WhatsApp ou e-mail"
+                            required
+                            hint="O mesmo contato que você informou ao reservar."
+                            error={form.errors.contact}
                         >
                             <Input
                                 value={form.data.contact}
                                 onChange={(e) => form.setData('contact', e.target.value)}
-                                placeholder="(11) 90000-0000"
+                                placeholder="(11) 90000-0000 ou voce@email.com"
                             />
                         </Field>
                         <Button type="submit" className="w-full" disabled={form.processing}>

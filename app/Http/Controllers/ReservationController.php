@@ -140,6 +140,12 @@ class ReservationController extends Controller
             'guest_phone' => $reservation->guest_phone,
             'delivery_point_name' => $reservation->delivery_point_name,
             'scheduled_at' => optional($reservation->cycleDeliveryPoint?->scheduled_at)->toIso8601String(),
+            'point_latitude' => $reservation->cycleDeliveryPoint?->deliveryPoint?->latitude !== null
+                ? (float) $reservation->cycleDeliveryPoint->deliveryPoint->latitude
+                : null,
+            'point_longitude' => $reservation->cycleDeliveryPoint?->deliveryPoint?->longitude !== null
+                ? (float) $reservation->cycleDeliveryPoint->deliveryPoint->longitude
+                : null,
             'delivery_date' => $reservation->deliveryCycle->delivery_date->toIso8601String(),
             'total_amount' => round((float) $reservation->total_amount, 2),
             'notes' => $reservation->notes,

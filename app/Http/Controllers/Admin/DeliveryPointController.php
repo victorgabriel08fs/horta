@@ -48,6 +48,8 @@ class DeliveryPointController extends Controller
                 'name' => $ponto->name,
                 'address' => $ponto->address,
                 'reference' => $ponto->reference,
+                'latitude' => $ponto->latitude !== null ? (float) $ponto->latitude : null,
+                'longitude' => $ponto->longitude !== null ? (float) $ponto->longitude : null,
                 'is_active' => $ponto->is_active,
             ],
         ]);

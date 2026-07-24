@@ -24,8 +24,8 @@ export function QuantityInput({ value, onChange, step = 1, max, min = 0, unitLab
     const inc = () => onChange(clamp(value + step));
 
     const btn =
-        'flex items-center justify-center rounded-md border border-stone-300 bg-white text-stone-600 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed';
-    const btnSize = size === 'sm' ? 'h-7 w-7 text-sm' : 'h-9 w-9';
+        'flex items-center justify-center rounded-lg border border-stone-300 bg-white text-lg text-stone-700 hover:bg-stone-50 active:bg-stone-100 disabled:opacity-40 disabled:cursor-not-allowed';
+    const btnSize = size === 'sm' ? 'h-9 w-9' : 'h-11 w-11';
 
     return (
         <div className="inline-flex items-center gap-1.5">

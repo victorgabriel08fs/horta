@@ -1,5 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/AppLayout';
+import { PointsMap } from '@/components/PointsMap';
 import { Button, ButtonLink, Card, StatusBadge } from '@/components/ui';
 import { brl, dateLongBR, qty, timeBR } from '@/lib/format';
 import { ReservationView } from '@/types';
@@ -70,6 +71,22 @@ export default function Confirmation({ reservation, can_cancel }: Props) {
                             </dd>
                         </div>
                     </dl>
+
+                    {reservation.point_latitude != null && reservation.point_longitude != null && (
+                        <div className="mt-4">
+                            <PointsMap
+                                points={[
+                                    {
+                                        id: reservation.id,
+                                        name: reservation.delivery_point_name,
+                                        latitude: reservation.point_latitude,
+                                        longitude: reservation.point_longitude,
+                                    },
+                                ]}
+                                height={180}
+                            />
+                        </div>
+                    )}
 
                     <div className="mt-6 border-t border-stone-200 pt-4">
                         <p className="mb-2 text-sm font-semibold text-stone-700">Itens</p>

@@ -80,6 +80,8 @@ class CyclePresenter
             'name' => $point->deliveryPoint->name,
             'address' => $point->deliveryPoint->address,
             'reference' => $point->deliveryPoint->reference,
+            'latitude' => $point->deliveryPoint->latitude !== null ? (float) $point->deliveryPoint->latitude : null,
+            'longitude' => $point->deliveryPoint->longitude !== null ? (float) $point->deliveryPoint->longitude : null,
             'scheduled_at' => optional($point->scheduled_at)->toIso8601String(),
             'capacity' => $point->capacity,
             'notes' => $point->notes,

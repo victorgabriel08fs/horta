@@ -14,6 +14,8 @@ class DeliveryPoint extends Model
         'name',
         'address',
         'reference',
+        'latitude',
+        'longitude',
         'is_active',
     ];
 
@@ -21,6 +23,8 @@ class DeliveryPoint extends Model
     {
         return [
             'is_active' => 'boolean',
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
         ];
     }
 

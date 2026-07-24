@@ -68,14 +68,28 @@ class ReservationFlowTest extends TestCase
         $this->assertEquals(17.0, $cycleProduct->fresh()->remainingQuantity());
     }
 
-    public function test_reservation_requires_guest_name_when_not_logged_in(): void
+    public function test_reservation_requires_name_and_a_contact_when_not_logged_in(): void
     {
         [, $cycleProduct, $point] = $this->openCycleWithStock();
 
         $this->post('/reservas', [
             'cycle_delivery_point_id' => $point->id,
             'items' => [['cycle_product_id' => $cycleProduct->id, 'quantity' => 1]],
-        ])->assertSessionHasErrors(['guest_name', 'guest_phone']);
+        ])->assertSessionHasErrors(['guest_name', 'guest_phone', 'guest_email']);
+    }
+
+    public function test_reservation_accepts_email_only_as_contact(): void
+    {
+        [, $cycleProduct, $point] = $this->openCycleWithStock();
+
+        $this->post('/reservas', [
+            'cycle_delivery_point_id' => $point->id,
+            'items' => [['cycle_product_id' => $cycleProduct->id, 'quantity' => 1]],
+            'guest_name' => 'Só E-mail',
+            'guest_email' => 'soemail@example.com',
+        ])->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('reservations', ['guest_email' => 'soemail@example.com']);
     }
 
     public function test_reservation_fails_for_point_outside_cycle(): void
@@ -104,8 +118,21 @@ class ReservationFlowTest extends TestCase
         ]);
         $reservation = Reservation::first();
 
+        // Sem contato → falha.
         $this->post('/consultar-reserva', [
             'confirmation_code' => $reservation->confirmation_code,
+        ])->assertSessionHasErrors('contact');
+
+        // Contato correto (telefone, tolerando formatação) → redireciona.
+        $this->post('/consultar-reserva', [
+            'confirmation_code' => $reservation->confirmation_code,
+            'contact' => '(11) 98888-7777',
         ])->assertRedirect("/reservas/{$reservation->id}/confirmacao?code={$reservation->confirmation_code}");
+
+        // Contato errado → falha.
+        $this->post('/consultar-reserva', [
+            'confirmation_code' => $reservation->confirmation_code,
+            'contact' => 'errado@example.com',
+        ])->assertSessionHasErrors('confirmation_code');
     }
 }
